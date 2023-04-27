@@ -19,26 +19,30 @@ def random_french_word():
 new_word = random_french_word()
 
 
-def card1config1():
-    global new_word, french_word_list, english_word_list
+def tick_function():
+    global new_word, french_word_list, english_word_list, flip_timer
+    window.after_cancel(flip_timer)
+    new_word = random_french_word()
     canvas.itemconfig(canvas_image, image=front_img)
     canvas.itemconfig(topic, text="French", fill="black")
     canvas.itemconfig(text, text=new_word, fill="black")
-    window.after(ms=3000, func=meaning)
-    french_word_list.remove(new_word)
     english_word_list.remove(word_dictionary[new_word])
+    french_word_list.remove(new_word)
+    flip_timer = window.after(ms=3000, func=flip_card)
 
 
-def card1config2():
-    global new_word, french_word_list
+def cross_function():
+    global new_word, flip_timer
+    window.after_cancel(flip_timer)
+    new_word = random_french_word()
     canvas.itemconfig(canvas_image, image=front_img)
     canvas.itemconfig(topic, text="French", fill="black")
     canvas.itemconfig(text, text=new_word, fill="black")
-    window.after(ms=3000, func=meaning)
+    flip_timer = window.after(ms=3000, func=flip_card)
 
 
 # ---------------------Generating relevant english word------------
-def meaning():
+def flip_card():
     global new_word
     canvas.itemconfig(canvas_image, image=back_img)
     canvas.itemconfig(topic, text="English", fill="white")
@@ -50,6 +54,9 @@ def meaning():
 window = Tk()
 window.title("Flashy")
 window.config(bg=BACKGROUND_COLOR, padx=50, pady=50)
+
+flip_timer = window.after(ms=3000, func=flip_card)
+
 canvas = Canvas(height=526, width=800, bg=BACKGROUND_COLOR, highlightthickness=0)
 front_img = PhotoImage(file=r"images\card_front.png")
 back_img = PhotoImage(file=r"images\card_back.png")
@@ -60,14 +67,13 @@ canvas.grid(row=0, column=0, columnspan=2)
 
 
 tick_img = PhotoImage(file=r"images\right.png")
-yes_button = Button(image=tick_img, highlightthickness=0, command=card1config1)
+yes_button = Button(image=tick_img, highlightthickness=0, command=tick_function)
 yes_button.grid(row=1, column=1)
 
 wrong_img = PhotoImage(file=r"images\wrong.png")
-wrong_button = Button(image=wrong_img, highlightthickness=0, command=card1config2)
+wrong_button = Button(image=wrong_img, highlightthickness=0, command=cross_function)
 wrong_button.grid(row=1, column=0)
 window.eval('tk::PlaceWindow . center')
-window.after(ms=3000, func=meaning)
 
 window.mainloop()
 new_word_dictionary = {"French": [keys for keys in french_word_list],
